@@ -63,6 +63,8 @@ const getSpecificFeatureFlag = async (
 export const getRemoveBrandingPermission = async (
   billingPlan: Organization["billing"]["plan"]
 ): Promise<boolean> => {
+  // Self-hosted: allow removing branding without Enterprise license
+  if (!IS_FORMBRICKS_CLOUD) return true;
   return getFeaturePermission(billingPlan, "removeBranding");
 };
 

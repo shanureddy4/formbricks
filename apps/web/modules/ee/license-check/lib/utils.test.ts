@@ -73,24 +73,10 @@ describe("License Utils", () => {
   });
 
   describe("getRemoveBrandingPermission", () => {
-    test("should return true if license active and feature enabled (self-hosted)", async () => {
+    test("should return true when self-hosted (branding toggle allowed without license)", async () => {
       vi.mocked(constants).IS_FORMBRICKS_CLOUD = false;
-      vi.mocked(licenseModule.getEnterpriseLicense).mockResolvedValue({
-        ...defaultLicense,
-        features: { ...defaultFeatures, removeBranding: true },
-      });
       const result = await getRemoveBrandingPermission(mockOrganization.billing.plan);
       expect(result).toBe(true);
-    });
-
-    test("should return false if license active but feature disabled (self-hosted)", async () => {
-      vi.mocked(constants).IS_FORMBRICKS_CLOUD = false;
-      vi.mocked(licenseModule.getEnterpriseLicense).mockResolvedValue({
-        ...defaultLicense,
-        features: { ...defaultFeatures, removeBranding: false },
-      });
-      const result = await getRemoveBrandingPermission(mockOrganization.billing.plan);
-      expect(result).toBe(false);
     });
 
     test("should return true if license active and plan is not FREE (cloud)", async () => {
@@ -107,7 +93,8 @@ describe("License Utils", () => {
       expect(result).toBe(false);
     });
 
-    test("should return false if license is inactive", async () => {
+    test("should return false if license is inactive (cloud)", async () => {
+      vi.mocked(constants).IS_FORMBRICKS_CLOUD = true;
       vi.mocked(licenseModule.getEnterpriseLicense).mockResolvedValue({
         ...defaultLicense,
         active: false,
